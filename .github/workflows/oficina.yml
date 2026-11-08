@@ -1,0 +1,52 @@
+name: Oficina de IA
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"   # cada 20 min: produce 1 vez al día, publica cuando toca, mide y responde cada hora
+  workflow_dispatch: {}       # botón "Run workflow" para probarlo a mano
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oficina-ia-ciclo
+  cancel-in-progress: false   # nunca se cruzan dos ciclos a la vez (evita publicar duplicado)
+
+jobs:
+  ciclo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Cachear el binario de ffmpeg (imageio-ffmpeg lo descarga aparte)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/imageio
+          key: imageio-ffmpeg-${{ runner.os }}
+
+      - name: Ejecutar un ciclo (produce si toca, publica lo pendiente, mide y responde)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CUENTA1_INSTAGRAM_TOKEN: ${{ secrets.CUENTA1_INSTAGRAM_TOKEN }}
+          CUENTA1_INSTAGRAM_USER_ID: ${{ secrets.CUENTA1_INSTAGRAM_USER_ID }}
+          CUENTA1_FACEBOOK_TOKEN: ${{ secrets.CUENTA1_FACEBOOK_TOKEN }}
+          CUENTA1_FACEBOOK_PAGE_ID: ${{ secrets.CUENTA1_FACEBOOK_PAGE_ID }}
+        run: python main.py
+
+      - name: Guardar estado (base de datos, vídeos pendientes de publicar, sprites reutilizables)
+        run: |
+          git config user.name "oficina-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A oficina.db sprites videos outbox
+          git diff --cached --quiet || git commit -m "ciclo $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push

@@ -1,0 +1,29 @@
+{
+  "cuentas": [
+    {
+      "id": "cuenta1",
+      "nicho": "visual education in pixel-art: how robots, engines, space, science and medicine work (explained with animated 3D/2D models)",
+      "idioma": "en",
+      "tono": "serious, clear and awe-inspiring; real facts with huge numbers as the hook",
+      "publicaciones_por_dia": 3,
+      "plataformas": [
+        "instagram",
+        "facebook"
+      ],
+      "estilo": "Serie de vídeos cortos verticales de animación pixel-art (8-bit) tipo 'How does X work?' (English). Título grande arriba con una etiqueta tipo 'REAL SPEED', una cifra espectacular de gancho (ej. RPM, toneladas, explosiones por segundo), vista en corte/sección animada del mecanismo, marca de agua pequeña. Cada dato debe estar verificado. Pocas piezas, muy cuidadas, sobre temas con búsqueda masiva (motores, aviones, barcos, ordenadores, cuerpo humano). Marca ORIGINAL, no copiar cuentas existentes.",
+      "voz_edge": "en-US-AndrewNeural",
+      "marca": "@robotlabs8",
+      "dominios": [
+        "robotica",
+        "ingenieria",
+        "espacio",
+        "ciencia",
+        "medicina"
+      ]
+    }
+  ],
+  "horas_ciclo": 24,
+  "modo_simulacion_publicacion": false,
+  "zona_horaria": "Europe/Madrid",
+  "zona_audiencia": "America/New_York"
+}

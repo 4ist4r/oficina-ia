@@ -1,0 +1,16 @@
+# entorno / caché de Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# credenciales que NUNCA deben subirse (las claves van en GitHub Secrets, no aquí)
+.env
+client_secret.json
+credenciales/
+
+# copia antigua duplicada del proyecto, no forma parte del repo
+oficina_ia/
+
+# vídeos de prueba sueltos de este chat, no de producción real
+videos/*/_test_local.mp4
