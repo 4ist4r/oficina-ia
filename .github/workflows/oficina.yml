@@ -44,9 +44,10 @@ jobs:
         run: python main.py
 
       - name: Guardar estado (base de datos, vídeos pendientes de publicar, sprites reutilizables)
+        if: always()   # guarda lo que se haya producido AUNQUE el paso anterior falle a medias (nunca perder el gasto ya hecho)
         run: |
           git config user.name "oficina-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A oficina.db sprites videos outbox
+          git add -A .
           git diff --cached --quiet || git commit -m "ciclo $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push
