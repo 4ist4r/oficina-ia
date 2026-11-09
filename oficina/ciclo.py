@@ -61,7 +61,7 @@ def _produccion_dia(cuenta, config, estado, of):
     cands = demanda.candidatos(estado, cid, doms, n=8)
     pets = demanda.peticiones(estado)[:10]
     print("  demanda:", [(x["tema"], x["score"]) for x in cands[:4]])
-    ideas = of["estrategia"].ejecutar(cuenta,
+    ideas = of["estrategia"].hacer(cuenta,
         f"Elige {cuenta['publicaciones_por_dia']} ideas de vídeo para hoy como gestor de DEMANDA: lo que el público más pide y busca. "
         f"Candidatos ya puntuados por interés real, tendencia, rendimiento propio y peticiones: {json.dumps(cands, ensure_ascii=False)}. "
         f"Peticiones literales del público (comentarios): {pets}. Rendimiento por dominio: {json.dumps(demanda.resumen_dominios(estado, cid), ensure_ascii=False)}. "
@@ -90,7 +90,7 @@ def _produccion_dia(cuenta, config, estado, of):
         gastado_antes = presupuesto.gastado  # para informar del coste de ESTE vídeo (el presupuesto es del día entero)
         feedback, contenido = "", None
         for intento in range(2):
-            contenido = of["contenido"].ejecutar(cuenta,
+            contenido = of["contenido"].hacer(cuenta,
                 f"Crea el guion del vídeo y los textos por plataforma ({', '.join(cuenta['plataformas'])}) para esta idea: "
                 f"{json.dumps(idea, ensure_ascii=False)}. {MED if idea.get('dominio') == 'medicina' else ''}Título máx. 36 caracteres, cifra gancho máx. 48 (número impactante), "
                 f"narración de 65-80 palabras MÁXIMO (frases cortas; "
@@ -112,7 +112,7 @@ def _produccion_dia(cuenta, config, estado, of):
             print("Calidad vetó:", idea.get("tema")); continue
 
         esc, sprites = arte.producir_escena(cuenta, contenido, of, pista=idea.get('visual_sugerido'), presupuesto=presupuesto)
-        plats = of["publicacion"].ejecutar(cuenta,
+        plats = of["publicacion"].hacer(cuenta,
             f"Adapta títulos, captions y hashtags al formato de cada plataforma: {json.dumps(contenido.get('plataformas'), ensure_ascii=False)}",
             CONTENIDO, max_tokens=4000, presupuesto=presupuesto).get("plataformas") or contenido["plataformas"]
         print(f"  [coste de este vídeo] ${presupuesto.gastado - gastado_antes:.3f} (acumulado del día: ${presupuesto.gastado:.3f})")
@@ -136,7 +136,7 @@ def _produccion_dia(cuenta, config, estado, of):
 
     # comunidad + analítica -> informe para el CEO de mañana
     plan, _ = estado.ultima_nota(cid, "plan_comunidad")
-    informe = of["analitica"].ejecutar(cuenta,
+    informe = of["analitica"].hacer(cuenta,
         f"Con estos datos reales {json.dumps(rend, ensure_ascii=False)} interpreta qué está funcionando, qué hora/formato/tema rinde más "
         f"y propón 2 experimentos A/B para mañana. Sé breve.",
         {"hallazgos": ["…"], "experimentos": [{"hipotesis": "…", "variante_a": "…", "variante_b": "…"}]}, presupuesto=presupuesto)

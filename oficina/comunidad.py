@@ -35,7 +35,7 @@ def responder_comentarios(estado, cuenta, oficina, max_por_ciclo=30):
         nuevos = [c for c in coms if not estado.q("select 1 from respondidos where comentario_id=?", (c["id"],)).fetchone()]
         if not nuevos: continue
         puede = plat != "youtube"
-        dec = oficina["comunidad"].ejecutar(cuenta,
+        dec = oficina["comunidad"].hacer(cuenta,
             f"{'Responde a estos comentarios en la voz de la marca (breve, amable, aporta un dato o pregunta que invite a seguir). No respondas a spam, odio ni provocaciones (responder=false). ' if puede else 'NO respondas (responder=false siempre). '}"
             f"Además EXTRAE las peticiones de temas ('haz un vídeo de X', 'how does Y work?') como peticiones con dominio (robotica, ingenieria, espacio, ciencia, medicina). Comentarios: {nuevos}",
             {"respuestas": [{"id": "…", "responder": True, "texto": "…"}], "peticiones": [{"tema": "how do jet engines work", "dominio": "ingenieria"}]})

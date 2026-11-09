@@ -1,38 +1,24 @@
-from .base import Agente, Departamento
+from .base import Agente
 from .llm import MODELO_ARTE
 
+# NOTA DE COSTE: antes cada paso de "oficina" (Estrategia, Contenido, Publicación, Analítica) era un Departamento
+# de 3 llamadas (2 del equipo + 1 director que las consolida), y cada una repetía el mismo contexto grande.
+# Eso multiplicaba el gasto por 3 sin que se notara en la calidad. Ahora son agentes únicos: menos llamadas,
+# mismo trabajo. Donde sí importa el criterio (visión del vídeo, verificación de datos) se queda con Sonnet;
+# donde es una tarea más mecánica (elegir de una lista ya puntuada, adaptar texto, leer métricas) se usa Haiku.
 def crear_oficina():
     A = Agente
     return {
-        # Nivel 1
-        "ceo": A("CEO", "Director General: fija objetivos y estrategia por cuenta, lee informes y decide cambios de rumbo", jefe=True),
-        # Nivel 2: departamentos (director + equipo)
-        "estrategia": Departamento("Estrategia y Tendencias",
-            A("Dir. Estrategia", "gestor de DEMANDA: decide qué temas atacar hoy según lo que el público más busca y pide (robótica, ingeniería, espacio, ciencia, medicina)", jefe=True),
-            # sin búsqueda web: la demanda real (Wikipedia + rendimiento propio) ya la calcula oficina/demanda.py gratis;
-            # la búsqueda web aquí salía muy cara (contenido de las páginas encontradas) para poco beneficio real
-            [A("Investigador de tendencias", "detecta temas, sonidos y formatos virales en TikTok/IG/YouTube/Facebook, a partir de los datos de demanda que te pasan"),
-             A("Analista de competencia", "estudia qué temas funcionan en el nicho y qué huecos hay, a partir de los datos de demanda que te pasan")]),
-        "contenido": Departamento("Contenido",
-            A("Dir. Contenido", "dirige guionistas y redactores; garantiza ganchos y retención", jefe=True),
-            [A("Guionista", "escribe guiones de vídeo corto con gancho, desarrollo y cierre con llamada a la acción"),
-             A("Redactor SEO", "escribe títulos, descripciones, captions y hashtags optimizados por plataforma")]),
+        "ceo": A("CEO", "Director General: fija objetivos y estrategia por cuenta, lee informes y decide cambios de rumbo. Sé muy breve."),
+        "estrategia": A("Dir. Estrategia", "gestor de DEMANDA: elige qué temas atacar hoy de una lista YA puntuada por interés real, tendencia y rendimiento propio. No inventes temas nuevos. Sé breve."),
+        "contenido": A("Dir. Contenido", "escribes el guion del vídeo corto (gancho, desarrollo, cierre) y los textos por plataforma; garantiza ganchos y retención", jefe=True),
         # Producción visual: director + artista de píxeles + crítico que MIRA los fotogramas renderizados
         "director_visual": A("Director visual", "diseñas la escena animada pixel-art: eliges componentes, sprites, cámara, eventos y los sincronizas con la narración para máxima retención", jefe=True),
         "artista": A("Artista de píxeles", "dibujas sprites pixel-art 8-bit nítidos y expresivos, con siluetas claras y sombreado de 3-4 tonos", modelo=MODELO_ARTE),
         "critico": A("Crítico visual", "miras fotogramas renderizados y evalúas con ojo exigente: legibilidad, composición, ritmo, errores visuales; propones correcciones concretas", jefe=True),
-        "publicacion": Departamento("Publicación",
-            A("Dir. Publicación", "dirige el calendario y la publicación", jefe=True),
-            [A("Planificador", "elige la mejor hora y frecuencia por plataforma"),
-             A("Adaptador de formato", "adapta una pieza a cada plataforma (ratio, duración, texto)")]),
-        "comunidad": Departamento("Comunidad",
-            A("Dir. Comunidad", "dirige la interacción con la audiencia", jefe=True),
-            [A("Community manager", "responde comentarios y mensajes con la voz de la marca"),
-             A("Captador de colaboraciones", "propone colaboraciones y menciones con cuentas afines")]),
-        "analitica": Departamento("Analítica y Crecimiento",
-            A("Dir. Analítica", "dirige la medición y los experimentos de crecimiento", jefe=True),
-            [A("Analista de métricas", "interpreta alcance, retención, seguidores ganados"),
-             A("Experimentador", "diseña tests A/B de ganchos, horarios y formatos")]),
+        "publicacion": A("Dir. Publicación", "adapta títulos, captions y hashtags al formato de cada plataforma. Sé breve."),
+        "comunidad": A("Dir. Comunidad", "respondes comentarios y mensajes con la voz de la marca, y extraes peticiones de temas. Sé breve."),
+        "analitica": A("Dir. Analítica", "interpretas qué está funcionando (alcance, retención, seguidores) y propones 2 experimentos A/B. Sé breve."),
         # Nivel 2 transversal: veto de calidad
         "calidad": A("Control de Calidad", "revisa cada pieza antes de publicar: VERIFICA cada dato y cifra (veta si no es comprobable), normas de plataforma, copyright, calidad del gancho; puede vetar (usa búsqueda web para comprobar datos); en MEDICINA veta cualquier diagnóstico, dosis o consejo de tratamiento y exige el aviso 'not medical advice'", jefe=True, web=True),
     }
