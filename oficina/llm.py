@@ -14,18 +14,29 @@ _cliente = None
 def simulado():
     return os.getenv("OFICINA_SIMULAR") == "1" or not os.getenv("ANTHROPIC_API_KEY")
 
+class PresupuestoAgotado(Exception):
+    """Freno de EMERGENCIA de verdad: para TODO (incluidos CEO/Estrategia, incluso un paso obligatorio)
+    en cuanto el gasto real ya pasó el límite duro. Esto NO es el objetivo normal (ver Presupuesto.agotado,
+    que solo decide si vale la pena pulir más) — esto es "algo se ha ido de madre, corta ya"."""
+
 class Presupuesto:
     """Gasto real (no estimado) de UNA pieza de contenido, calculado a partir de los tokens que devuelve cada llamada.
-    NUNCA corta una llamada a medias ni aborta el vídeo: solo informa, para que ciclo.py/arte.py decidan si
-    vale la pena un reintento o una pasada extra de pulido (eso sí es opcional), nunca si se completan
-    los pasos obligatorios para tener un vídeo terminado."""
-    def __init__(self, limite_usd=0.5):
+    Tiene dos niveles:
+      - objetivo (`limite`): decide si vale la pena un reintento o una pasada extra de pulido (ciclo.py/arte.py).
+      - límite duro (`limite_duro`, por defecto 3x el objetivo): si se cruza, NINGUNA llamada más se permite
+        (ni las obligatorias), para que un fallo real (p.ej. búsqueda web descontrolada) no siga gastando sin fin."""
+    def __init__(self, limite_usd=0.5, limite_duro=None):
         self.limite = limite_usd
+        self.limite_duro = limite_duro if limite_duro is not None else limite_usd * 3
         self.gastado = 0.0
         self.llamadas = 0
 
     def agotado(self):
         return self.gastado >= self.limite
+
+    def comprobar_emergencia(self):
+        if self.gastado >= self.limite_duro:
+            raise PresupuestoAgotado(f"${self.gastado:.3f} gastados, límite duro ${self.limite_duro:.2f} — se para todo")
 
     def registrar(self, modelo, usage, busquedas=0):
         pin, pout = PRECIOS.get(modelo, (2.0, 10.0))
@@ -64,6 +75,8 @@ def _extraer(txt, ejemplo):
 def pedir_json(system, tarea, ejemplo, modelo=MODELO_RAPIDO, max_tokens=3000, web=False, imagenes=None, presupuesto=None):
     if simulado():
         return json.loads(json.dumps(ejemplo))
+    if presupuesto is not None:
+        presupuesto.comprobar_emergencia()  # si ya está disparado el freno de emergencia, ni una llamada más
     global _cliente
     if _cliente is None:
         import anthropic
@@ -77,8 +90,8 @@ def pedir_json(system, tarea, ejemplo, modelo=MODELO_RAPIDO, max_tokens=3000, we
                      for b in (imagenes or [])] + [{"type": "text", "text": prompt}]
         kw = dict(model=modelo, max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": contenido}])
         try:
-            if web:  # búsqueda web del servidor de Anthropic: tendencias y comprobación de datos
-                r = _cliente.messages.create(tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 3}], **kw)
+            if web:  # búsqueda web del servidor de Anthropic: tendencias y comprobación de datos (cara: limitada a 2 búsquedas)
+                r = _cliente.messages.create(tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 2}], **kw)
             else:
                 r = _cliente.messages.create(**kw)
         except Exception:
@@ -88,7 +101,8 @@ def pedir_json(system, tarea, ejemplo, modelo=MODELO_RAPIDO, max_tokens=3000, we
         if presupuesto is not None:
             busquedas = getattr(getattr(r.usage, "server_tool_use", None), "web_search_requests", 0) or 0
             coste = presupuesto.registrar(modelo, r.usage, busquedas)
-            print(f"  [coste] {modelo}: +${coste:.4f} (acumulado ${presupuesto.gastado:.3f} / ${presupuesto.limite:.2f})")
+            print(f"  [coste] {modelo}: +${coste:.4f} (acumulado ${presupuesto.gastado:.3f} / objetivo ${presupuesto.limite:.2f} / duro ${presupuesto.limite_duro:.2f})")
+            presupuesto.comprobar_emergencia()  # esta misma llamada puede haber disparado el freno: no reintentes
         txt = "".join(b.text for b in r.content if b.type == "text")
         res = _extraer(txt, ejemplo)
         if res is not None:

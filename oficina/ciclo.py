@@ -5,7 +5,7 @@ from . import motor2, voz, arte, demanda
 from .analitica import resumen
 from .horarios import elegir_hora, proxima_ocurrencia
 from .publicadores import PUBLICADORES
-from .llm import Presupuesto
+from .llm import Presupuesto, PresupuestoAgotado
 
 TOPE_USD_POR_VIDEO = 0.5  # ningún vídeo puede costar más de esto; nunca se aborta a medias, solo se dejan de pulir pasadas opcionales
 
@@ -30,6 +30,14 @@ def _viabilidad(idea, cands_por_tema):
     return round(max(0.0, min(1.0, demanda - riesgo)), 3)
 
 def produccion_dia(cuenta, config, estado, of):
+    """No repite intento cada 20 min si salta el freno de emergencia: se considera el día como 'intentado' igual,
+    para no quedar en un bucle de gasto repetido sin producir nada."""
+    try:
+        _produccion_dia(cuenta, config, estado, of)
+    except PresupuestoAgotado as e:
+        print(f"[FRENO DE EMERGENCIA] {cuenta['id']}: {e} — se para la producción de hoy aquí, no se reintenta hasta mañana")
+
+def _produccion_dia(cuenta, config, estado, of):
     cid = cuenta["id"]
     tz = config.get("zona_audiencia", config.get("zona_horaria", "Europe/Madrid"))  # horas óptimas en la zona de la AUDIENCIA
     simular = config.get("modo_simulacion_publicacion", True)
@@ -37,10 +45,15 @@ def produccion_dia(cuenta, config, estado, of):
     rend = resumen(estado, cid, cuenta["plataformas"])
     informe, _ = estado.ultima_nota(cid, "informe_analitica")
 
+    # presupuesto de TODO el día (CEO + Estrategia + cada vídeo), no solo de cada vídeo por separado:
+    # así el freno de emergencia también cubre lo que pasa ANTES de llegar al primer vídeo.
+    n_videos = max(1, cuenta.get("publicaciones_por_dia", 1))
+    presupuesto = Presupuesto(TOPE_USD_POR_VIDEO, limite_duro=TOPE_USD_POR_VIDEO * n_videos * 2)
+
     directrices = of["ceo"].hacer(cuenta,
         f"Fija las directrices de hoy. Rendimiento real (mejores/peores piezas y horas): {json.dumps(rend, ensure_ascii=False)}. "
-        f"Informe analítico previo: {json.dumps(informe, ensure_ascii=False)}. Duplica lo que funciona y corta lo que no.",
-        {"objetivo": "…", "pilares_contenido": ["…"], "que_evitar": ["…"]})
+        f"Informe analítico previo: {json.dumps(informe, ensure_ascii=False)}. Duplica lo que funciona y corta lo que no. Sé breve (máx. 80 palabras).",
+        {"objetivo": "…", "pilares_contenido": ["…"], "que_evitar": ["…"]}, presupuesto=presupuesto)
     estado.nota(cid, "directrices", directrices)
     print("CEO:", directrices.get("objetivo"))
 
@@ -52,9 +65,10 @@ def produccion_dia(cuenta, config, estado, of):
         f"Elige {cuenta['publicaciones_por_dia']} ideas de vídeo para hoy como gestor de DEMANDA: lo que el público más pide y busca. "
         f"Candidatos ya puntuados por interés real, tendencia, rendimiento propio y peticiones: {json.dumps(cands, ensure_ascii=False)}. "
         f"Peticiones literales del público (comentarios): {pets}. Rendimiento por dominio: {json.dumps(demanda.resumen_dominios(estado, cid), ensure_ascii=False)}. "
-        f"Puedes elegir de los candidatos o proponer un tema nuevo si la búsqueda web muestra una tendencia mejor (dominios permitidos: {doms or 'todos'}). "
-        f"Mezcla dominios si hay varias ideas. Directrices: {json.dumps(directrices, ensure_ascii=False)}. Evita repetir: {[r['titulo'] for r in estado_titulos(estado, cid)]}",
-        {"ideas": [{"tema": "How a rotary engine works", "dominio": "ingenieria", "visual_sugerido": "iso:motor_abierto", "angulo": "…", "por_que_funcionara": "…"}]})
+        f"Elige de estos candidatos (no inventes temas nuevos, ya están puntuados por demanda real). "
+        f"Mezcla dominios si hay varias ideas. Directrices: {json.dumps(directrices, ensure_ascii=False)}. Evita repetir: {[r['titulo'] for r in estado_titulos(estado, cid)]}. Sé breve.",
+        {"ideas": [{"tema": "How a rotary engine works", "dominio": "ingenieria", "visual_sugerido": "iso:motor_abierto", "angulo": "…", "por_que_funcionara": "…"}]},
+        presupuesto=presupuesto)
 
     lista_ideas = ideas.get("ideas") or []
     if not lista_ideas and cands:  # plan B: si Estrategia no decide nada, usa directamente los candidatos ya puntuados por demanda
@@ -73,7 +87,7 @@ def produccion_dia(cuenta, config, estado, of):
         viables = [{"tema": cands[0]["tema"], "dominio": cands[0]["dominio"], "visual_sugerido": cands[0].get("visual")}]
 
     for idea in viables[:cuenta["publicaciones_por_dia"]]:
-        presupuesto = Presupuesto(TOPE_USD_POR_VIDEO)  # gasto real de ESTE vídeo, a cero cada vez
+        gastado_antes = presupuesto.gastado  # para informar del coste de ESTE vídeo (el presupuesto es del día entero)
         feedback, contenido = "", None
         for intento in range(2):
             contenido = of["contenido"].ejecutar(cuenta,
@@ -101,7 +115,7 @@ def produccion_dia(cuenta, config, estado, of):
         plats = of["publicacion"].ejecutar(cuenta,
             f"Adapta títulos, captions y hashtags al formato de cada plataforma: {json.dumps(contenido.get('plataformas'), ensure_ascii=False)}",
             CONTENIDO, max_tokens=4000, presupuesto=presupuesto).get("plataformas") or contenido["plataformas"]
-        print(f"  [coste total del vídeo] ${presupuesto.gastado:.3f} en {presupuesto.llamadas} llamadas (tope ${presupuesto.limite:.2f})")
+        print(f"  [coste de este vídeo] ${presupuesto.gastado - gastado_antes:.3f} (acumulado del día: ${presupuesto.gastado:.3f})")
 
         # montaje del vídeo: voz + animación + música
         carpeta = f"videos/{cid}"; os.makedirs(carpeta, exist_ok=True)
@@ -124,9 +138,10 @@ def produccion_dia(cuenta, config, estado, of):
     plan, _ = estado.ultima_nota(cid, "plan_comunidad")
     informe = of["analitica"].ejecutar(cuenta,
         f"Con estos datos reales {json.dumps(rend, ensure_ascii=False)} interpreta qué está funcionando, qué hora/formato/tema rinde más "
-        f"y propón 2 experimentos A/B para mañana.",
-        {"hallazgos": ["…"], "experimentos": [{"hipotesis": "…", "variante_a": "…", "variante_b": "…"}]})
+        f"y propón 2 experimentos A/B para mañana. Sé breve.",
+        {"hallazgos": ["…"], "experimentos": [{"hipotesis": "…", "variante_a": "…", "variante_b": "…"}]}, presupuesto=presupuesto)
     estado.nota(cid, "informe_analitica", informe)
+    print(f"  [coste total del día] ${presupuesto.gastado:.3f} en {presupuesto.llamadas} llamadas (objetivo ${presupuesto.limite:.2f}/vídeo, freno de emergencia a ${presupuesto.limite_duro:.2f})")
 
 def estado_titulos(estado, cid):
     return [{"titulo": t} for _, _, _, _, _, _, t, _ in estado.publicaciones(cid)[:30]]

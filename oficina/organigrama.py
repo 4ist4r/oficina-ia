@@ -9,8 +9,10 @@ def crear_oficina():
         # Nivel 2: departamentos (director + equipo)
         "estrategia": Departamento("Estrategia y Tendencias",
             A("Dir. Estrategia", "gestor de DEMANDA: decide qué temas atacar hoy según lo que el público más busca y pide (robótica, ingeniería, espacio, ciencia, medicina)", jefe=True),
-            [A("Investigador de tendencias", "detecta temas, sonidos y formatos virales en TikTok/IG/YouTube/Facebook (usa búsqueda web)", web=True),
-             A("Analista de competencia", "estudia qué hacen las cuentas grandes del nicho y qué huecos dejan (usa búsqueda web)", web=True)]),
+            # sin búsqueda web: la demanda real (Wikipedia + rendimiento propio) ya la calcula oficina/demanda.py gratis;
+            # la búsqueda web aquí salía muy cara (contenido de las páginas encontradas) para poco beneficio real
+            [A("Investigador de tendencias", "detecta temas, sonidos y formatos virales en TikTok/IG/YouTube/Facebook, a partir de los datos de demanda que te pasan"),
+             A("Analista de competencia", "estudia qué temas funcionan en el nicho y qué huecos hay, a partir de los datos de demanda que te pasan")]),
         "contenido": Departamento("Contenido",
             A("Dir. Contenido", "dirige guionistas y redactores; garantiza ganchos y retención", jefe=True),
             [A("Guionista", "escribe guiones de vídeo corto con gancho, desarrollo y cierre con llamada a la acción"),
