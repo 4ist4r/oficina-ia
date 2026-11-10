@@ -37,6 +37,10 @@ class Estado:
     def marcar(self, id_, estado):
         self.q("update cola set estado=? where id=?", (estado, id_))
 
+    def reprogramar(self, id_, programada, datos):
+        """Deja la fila en 'pendiente' pero para más tarde (reintento con backoff) guardando el nº de intentos en datos."""
+        self.q("update cola set programada=?, datos=? where id=?", (programada, json.dumps(datos, ensure_ascii=False), id_))
+
     def registrar_publicacion(self, cuenta, plat, post_id, hora, titulo, caption, dominio=None, tema=None):
         return self.q("insert into publicaciones(cuenta,plataforma,post_id,ts,hora,titulo,caption,dominio,tema) values(?,?,?,?,?,?,?,?,?)",
                       (cuenta, plat, str(post_id), time.time(), hora, titulo, caption, dominio, tema)).lastrowid

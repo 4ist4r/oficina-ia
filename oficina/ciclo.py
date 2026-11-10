@@ -9,6 +9,9 @@ from .llm import Presupuesto, PresupuestoAgotado
 
 TOPE_USD_POR_VIDEO = 0.5  # ningún vídeo puede costar más de esto; nunca se aborta a medias, solo se dejan de pulir pasadas opcionales
 
+MAX_REINTENTOS_PUBLICACION = 5  # si la API de la red social falla (token, bloqueo temporal, etc.), antes de darse por vencido
+ESPERA_REINTENTO_SEGUNDOS = 1800  # backoff lineal: intento 2 a los 30min, intento 3 a los 60min, ...
+
 CONTENIDO = {"titulo": "How a rotary engine works", "etiqueta": "Real speed", "cifra": "9,000 RPM: 300 explosions a second",
              "narracion": "This engine has no pistons. A triangular rotor spins inside a housing. Every turn completes four phases. At 9,000 RPM, that is 300 explosions every second. Follow for the next machine.",
              "plataformas": [{"plataforma": "tiktok", "titulo": "…", "caption": "…", "hashtags": ["#ejemplo"]}]}
@@ -158,8 +161,15 @@ def publicar_pendientes(config, estado):
             estado.marcar(id_, "publicada")
             print(f"[publicado] {cid}/{plat}: {datos.get('titulo')} ({res.get('ruta') or res.get('id')})")
         else:
-            estado.marcar(id_, "error")
-            print(f"[ERROR publicando] {cid}/{plat}: {res.get('respuesta')}")
+            intentos = datos.get("_intentos", 0) + 1
+            datos["_intentos"] = intentos
+            if intentos >= MAX_REINTENTOS_PUBLICACION:
+                estado.marcar(id_, "error")
+                print(f"[ERROR publicando] {cid}/{plat} (intento {intentos}/{MAX_REINTENTOS_PUBLICACION}, se agotaron los reintentos): {res.get('respuesta')}")
+            else:
+                espera = ESPERA_REINTENTO_SEGUNDOS * intentos
+                estado.reprogramar(id_, time.time() + espera, datos)
+                print(f"[ERROR publicando] {cid}/{plat} (intento {intentos}/{MAX_REINTENTOS_PUBLICACION}, reintento en {espera // 60} min): {res.get('respuesta')}")
         _limpiar_video_si_ya_no_hace_falta(estado, cid, datos.get("video_path"))
 
 def _limpiar_video_si_ya_no_hace_falta(estado, cid, video_path):
