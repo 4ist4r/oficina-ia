@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<style>
+  :root {
+    --ground: #28100c; --ink: #faf0e1; --accent: #ffd750;
+    --metal-light: #aa968c; --metal-dark: #5f3226; --hot: #ff5a28; --cold: #5aa0ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--ground);
+    font-family:"Archivo Black","Arial Black",sans-serif; }
+  #bg { position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--cold) 22%, var(--ground)) 0%, var(--ground) 62%),
+      conic-gradient(from 0deg at 50% 85%, color-mix(in srgb, var(--hot) 10%, transparent), transparent 40%); }
+  #root { width:100%; height:100%; position:relative; }
+  #tag { position:absolute; top:190px; left:0; right:0; text-align:center; color:var(--accent);
+    font-size:36px; letter-spacing:9px; text-shadow:3px 3px 0 #000; }
+  #cifra { position:absolute; top:272px; left:0; right:0; text-align:center; color:var(--ink);
+    font-size:80px; line-height:1.08; text-shadow:6px 6px 0 #000; padding:0 70px; }
+  #stage { position:absolute; left:50%; top:630px; width:700px; height:700px; margin-left:-350px; }
+  #marca { position:absolute; bottom:120px; left:0; right:0; text-align:center; color:var(--metal-light);
+    font-size:30px; letter-spacing:5px; }
+  .sub { position:absolute; bottom:420px; left:60px; right:60px; text-align:center; color:var(--ink);
+    font-size:48px; line-height:1.15; text-shadow:4px 4px 0 #000; overflow:visible; }
+  .sub span { display:block; }
+  .ov { position:absolute; transform:translate(-50%,-50%); color:var(--ink); text-align:center;
+    text-shadow:4px 4px 0 #000; white-space:nowrap; letter-spacing:1px; }
+  .ov span { display:block; }
+  #flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; }
+</style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="30.56" data-width="1080" data-height="1920">
+    <div id="bg" class="clip" data-start="0" data-duration="30.56" data-track-index="0"></div>
+    <div id="tag" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>Real speed</div>
+    <div id="cifra" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>400 EXPLOSIONS PER SECOND AT 6,000 RPM</div>
+    <div id="stage" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>
+      
+      <div id="gear"></div>
+      <div id="piston"></div>
+      <style>
+        #gear { position:absolute; left:50%; top:50%; width:420px; height:420px;
+          margin-left:-210px; margin-top:-210px;
+          background: repeating-conic-gradient(#aa968c 0deg 15deg, #5f3226 15deg 30deg);
+          border-radius:50%;
+          clip-path: polygon(50% 0%,56% 0%,58% 8%,66% 6%,70% 13%,78% 10%,80% 18%,88% 18%,88% 26%,96% 28%,
+            94% 36%,100% 40%,96% 48%,100% 56%,94% 60%,96% 68%,88% 70%,88% 78%,80% 78%,78% 86%,70% 83%,
+            66% 90%,58% 88%,56% 96%,50% 96%,44% 96%,42% 88%,34% 90%,30% 83%,22% 86%,20% 78%,12% 78%,
+            12% 70%,4% 68%,6% 60%,0% 56%,4% 48%,0% 40%,6% 36%,4% 28%,12% 26%,12% 18%,20% 18%,22% 10%,
+            30% 13%,34% 6%,42% 8%);
+          box-shadow: inset 10px 10px 0 rgba(255,255,255,.25), inset -10px -10px 0 rgba(0,0,0,.4); }
+        #gear::after { content:""; position:absolute; left:50%; top:50%; width:150px; height:150px;
+          margin-left:-75px; margin-top:-75px;
+          border-radius:50%; background:#5f3226;
+          box-shadow: inset 8px 8px 0 rgba(0,0,0,.5), inset -8px -8px 0 rgba(255,255,255,.15); }
+        #piston { position:absolute; left:50%; top:50%; width:80px; height:380px;
+          margin-left:-40px; margin-top:-430px;
+          background: linear-gradient(90deg,#5f3226 0%,#aa968c 45%,#ff9646 55%,#5f3226 100%);
+          box-shadow: inset 6px 0 0 rgba(255,255,255,.3), inset -6px 0 0 rgba(0,0,0,.4); }
+        #piston::before { content:""; position:absolute; left:-18px; top:-36px; width:116px; height:56px;
+          background:#aa968c;
+          box-shadow: inset 6px 6px 0 rgba(255,255,255,.3), inset -6px -6px 0 rgba(0,0,0,.45); }
+      </style>
+    </div>
+    <div id="sub0" class="clip sub" data-start="0.00" data-duration="2.89"><span id="sub0i">HOW DOES A V8 ENGINE KEEP EIGHT EXPLOSIONS IN</span></div><div id="sub1" class="clip sub" data-start="2.97" data-duration="0.84"><span id="sub1i">PERFECT ORDER?</span></div><div id="sub2" class="clip sub" data-start="3.90" data-duration="1.11"><span id="sub2i">WATCH THE CUTAWAY.</span></div><div id="sub3" class="clip sub" data-start="5.09" data-duration="2.63"><span id="sub3i">FIRST, THE SPARK PLUG IGNITES THE FUEL IN</span></div><div id="sub4" class="clip sub" data-start="7.79" data-duration="0.78"><span id="sub4i">CYLINDER ONE.</span></div><div id="sub5" class="clip sub" data-start="8.65" data-duration="2.50"><span id="sub5i">THE PISTON IS SHOVED DOWN AND TURNS THE</span></div><div id="sub6" class="clip sub" data-start="11.23" data-duration="0.65"><span id="sub6i">CRANKSHAFT.</span></div><div id="sub7" class="clip sub" data-start="11.95" data-duration="2.69"><span id="sub7i">NINETY CRANK DEGREES LATER, CYLINDER EIGHT</span></div><div id="sub8" class="clip sub" data-start="14.73" data-duration="0.32"><span id="sub8i">FIRES.</span></div><div id="sub9" class="clip sub" data-start="15.12" data-duration="2.56"><span id="sub9i">THEN FOUR, THREE, SIX, FIVE, SEVEN, TWO.</span></div><div id="sub10" class="clip sub" data-start="17.77" data-duration="2.69"><span id="sub10i">THATS THE CLASSIC CHEVY SMALL-BLOCK ORDER.</span></div><div id="sub11" class="clip sub" data-start="20.54" data-duration="2.30"><span id="sub11i">EVERY CRANK TURN DELIVERS FOUR POWER</span></div><div id="sub12" class="clip sub" data-start="22.92" data-duration="2.89"><span id="sub12i">STROKES, SO AT 6,000 RPM THATS 400 EXPLOSIONS</span></div><div id="sub13" class="clip sub" data-start="25.89" data-duration="0.78"><span id="sub13i">EVERY SECOND.</span></div><div id="sub14" class="clip sub" data-start="26.75" data-duration="2.23"><span id="sub14i">FOLLOW FOR MORE MACHINES EXPLAINED.</span></div>
+    <div id="ov1001" class="clip ov" data-start="0.00" data-duration="4.89" style="left:540px;top:510px;font-size:52px"><span id="ov1001i">0</span></div><div id="ov1002" class="clip ov" data-start="16.81" data-duration="5.20" style="left:540px;top:640px;font-size:36px"><span id="ov1002i">1-8-4-3-6-5-7-2</span></div><div id="ov1003" class="clip ov" data-start="22.61" data-duration="5.50" style="left:540px;top:640px;font-size:36px"><span id="ov1003i">400 EXPLOSIONS/SEC</span></div>
+    <div id="marca" class="clip" data-start="0" data-duration="30.56" data-track-index="1">@robotlabs8</div>
+    <div id="flash" class="clip" data-start="0" data-duration="30.56" data-track-index="2"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#tag", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0);
+    tl.fromTo("#cifra", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0.15);
+    tl.fromTo("#marca", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.6);
+    
+      tl.to("#gear", { rotation: 360 * 22.9, duration: 30.56, ease: "none" }, 0);
+      tl.fromTo("#piston", { y: 0 }, { y: 160, duration: 0.333,
+        repeat: 91, yoyo: true, ease: "sine.inOut" }, 0);
+    
+      tl.fromTo("#sub0i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.00);
+      tl.to("#sub0i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 2.79);
+      tl.fromTo("#sub1i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 2.97);
+      tl.to("#sub1i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 3.72);
+      tl.fromTo("#sub2i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.90);
+      tl.to("#sub2i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 4.91);
+      tl.fromTo("#sub3i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 5.09);
+      tl.to("#sub3i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 7.61);
+      tl.fromTo("#sub4i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 7.79);
+      tl.to("#sub4i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 8.47);
+      tl.fromTo("#sub5i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 8.65);
+      tl.to("#sub5i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 11.05);
+      tl.fromTo("#sub6i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 11.23);
+      tl.to("#sub6i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 11.77);
+      tl.fromTo("#sub7i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 11.95);
+      tl.to("#sub7i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 14.55);
+      tl.fromTo("#sub8i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 14.73);
+      tl.to("#sub8i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 14.94);
+      tl.fromTo("#sub9i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 15.12);
+      tl.to("#sub9i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 17.59);
+      tl.fromTo("#sub10i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 17.77);
+      tl.to("#sub10i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 20.36);
+      tl.fromTo("#sub11i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 20.54);
+      tl.to("#sub11i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 22.74);
+      tl.fromTo("#sub12i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 22.92);
+      tl.to("#sub12i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 25.71);
+      tl.fromTo("#sub13i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 25.89);
+      tl.to("#sub13i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 26.57);
+      tl.fromTo("#sub14i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 26.75);
+      tl.to("#sub14i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 28.88);
+    
+      { const o = { v: 0.0 };
+        tl.fromTo("#ov1001i", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.00);
+        tl.to(o, { v: 6000.0, duration: 4.16, ease: "power1.out",
+          onUpdate: () => { const el = document.getElementById("ov1001i");
+            if (el) el.textContent = "" + Math.round(o.v).toLocaleString("en-US") + " RPM"; } }, 0.00); }
+      tl.fromTo("#ov1002i", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.2 }, 16.81);
+      tl.to("#ov1002i", { opacity: 0, duration: 0.15, ease: "power2.in" }, 21.85);
+      tl.fromTo("#ov1003i", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.2 }, 22.61);
+      tl.to("#ov1003i", { opacity: 0, duration: 0.15, ease: "power2.in" }, 27.97);
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = tl;
+    tl.seek(0);
+  </script>
+</body>
+</html>

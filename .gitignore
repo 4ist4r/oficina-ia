@@ -14,3 +14,8 @@ oficina_ia/
 
 # vídeos de prueba sueltos de este chat, no de producción real
 videos/*/_test_local.mp4
+
+# caché/artefactos generados por la CLI de HyperFrames (motor_html.py); se regeneran solos
+hyperframes_proj/.hyperframes/
+hyperframes_proj/node_modules/
+hyperframes_proj/renders/

@@ -3,6 +3,7 @@ el Crítico MIRA fotogramas renderizados y pide correcciones (bucle generar -> r
 import io, json, os, re
 from PIL import Image
 from . import motor2
+from . import motor_html
 from . import iso as isom
 from .componentes import COMPONENTES
 
@@ -111,19 +112,24 @@ def crear_sprites(cuenta, necesarios, of, carpeta="sprites", presupuesto=None):
             json.dump(sp, open(ruta, "w", encoding="utf-8"), ensure_ascii=False); defs[nombre] = sp
     return defs
 
-def producir_escena(cuenta, contenido, of, max_iter=2, pista=None, presupuesto=None):
-    """Devuelve (escena, sprites_defs) listos para motor2.renderizar. El director visual y el crítico (paso 1 de cada uno)
-    son obligatorios para tener un vídeo; las pasadas de corrección SOLO se hacen si queda presupuesto."""
+def producir_escena(cuenta, contenido, of, max_iter=2, pista=None, presupuesto=None, motor=None):
+    """Devuelve (escena, sprites_defs) listos para motor2.renderizar (o motor_html.renderizar si se pasa
+    motor=motor_html: misma 'escena' JSON, otro backend de dibujo). El director visual y el crítico (paso 1
+    de cada uno) son obligatorios para tener un vídeo; las pasadas de corrección SOLO se hacen si queda presupuesto."""
+    motor = motor or motor2
+    guia = motor_html.GUIA_ESCENA_HTML if motor is motor_html else GUIA_ESCENA
     base = (f"Contenido del vídeo: título='{contenido.get('titulo')}', etiqueta='{contenido.get('etiqueta')}', cifra='{contenido.get('cifra')}', "
             f"narración='{contenido.get('narracion')}'. Mantén la narración (puedes pulirla para 25-35 s). "
             + (f"Pista de visual sugerida por el gestor de demanda: {pista} (iso:X = preset 3D, 2d:X = componente 2D); úsala si encaja o elige algo mejor. " if pista else ""))
-    plan = of["director_visual"].hacer(cuenta, GUIA_ESCENA + "\n" + base, PLAN_EJEMPLO, max_tokens=12000, presupuesto=presupuesto)
+    plan = of["director_visual"].hacer(cuenta, guia + "\n" + base, PLAN_EJEMPLO, max_tokens=12000, presupuesto=presupuesto)
     sprites = crear_sprites(cuenta, plan.get("sprites_necesarios"), of, presupuesto=presupuesto)
     mejor_plan, mejor_punt = plan, -1
     for it in range(max_iter):
         esc = plan.get("escena") or {}
         esc["idioma"] = cuenta.get("idioma", "en"); esc["marca"] = cuenta.get("marca", "")
-        previa = hoja(motor2.fotogramas_previa(esc, sprites, tiempos=(.06, .3, .55, .8)))
+        frames = motor.fotogramas_previa(esc, sprites, tiempos=(.06, .3, .55, .8))
+        escala = min(1.5, 7800 / (frames[0].size[0] * len(frames)))  # el límite de la API es 8000px de lado
+        previa = hoja(frames, escala=escala)
         rev = of["critico"].hacer(cuenta,
             "Eres un crítico visual muy exigente de vídeos virales pixel-art (formato vertical). Estos 4 fotogramas son momentos del vídeo (de izquierda a derecha). "
             "Evalúa: ¿se entiende el mecanismo?, ¿hay solapes o textos cortados?, ¿composición y uso del espacio?, ¿gancho visual?, ¿variedad de ritmo? "
@@ -139,7 +145,7 @@ def producir_escena(cuenta, contenido, of, max_iter=2, pista=None, presupuesto=N
         if presupuesto is not None and presupuesto.agotado():
             print(f"  (sin presupuesto para pulir más la escena; nos quedamos con la mejor hasta ahora: {mejor_punt}/10)")
             break
-        plan = of["director_visual"].hacer(cuenta, GUIA_ESCENA + f"\nESCENA ACTUAL: {json.dumps(esc, ensure_ascii=False)}\n"
+        plan = of["director_visual"].hacer(cuenta, guia + f"\nESCENA ACTUAL: {json.dumps(esc, ensure_ascii=False)}\n"
             f"Corrígela según el crítico: {json.dumps(rev, ensure_ascii=False)}. Sprites ya disponibles: {list(sprites)}.", PLAN_EJEMPLO, max_tokens=12000, presupuesto=presupuesto)
         sprites.update(crear_sprites(cuenta, plan.get("sprites_necesarios"), of, presupuesto=presupuesto))
     plan = mejor_plan
