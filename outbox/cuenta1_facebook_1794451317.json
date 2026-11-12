@@ -1,0 +1,17 @@
+{
+ "motivo": "simulación o sin credenciales",
+ "plataforma": "facebook",
+ "titulo": "How drones fly: 4 propellers, up to 8,000 corrections a second",
+ "caption": "How does a drone hover without falling over?\n\nIt has four propellers. Two spin clockwise and two counterclockwise, so their twisting forces cancel out. Speeding up or slowing down individual motors makes it climb, descend, turn or tilt forward.\n\nA gyroscope senses every tilt, and the flight controller runs up to 8,000 control loops per second on racing drones.\n\nWhich machine should we explain next? Let us know in the comments, and follow for more pixel-art cutaways of how things work.",
+ "hashtags": [
+  "#HowItWorks",
+  "#Drones",
+  "#Engineering",
+  "#Robotics",
+  "#PixelArt"
+ ],
+ "dominio": "robotica",
+ "tema": "How drones fly",
+ "video_path": "videos/cuenta1/1794398942403_19280.mp4",
+ "hora": 19
+}
