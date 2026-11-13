@@ -1,0 +1,17 @@
+{
+ "motivo": "simulación o sin credenciales",
+ "plataforma": "facebook",
+ "titulo": "How does a drone stay level in mid-air?",
+ "caption": "How does a drone stay level when nothing holds it up?\n\nFour propellers provide lift. Two spin clockwise and two counterclockwise, so their torque cancels out. A gyroscope senses every tilt, and the flight controller adjusts each motor's speed to correct it. Racing drones repeat this cycle up to 8,000 times per second.\n\nFollow for more visual explanations of how machines work. Which one should we break down next: a jet engine, a robot arm or a heart?",
+ "hashtags": [
+  "#drones",
+  "#howitworks",
+  "#engineering",
+  "#robotics",
+  "#pixelart"
+ ],
+ "dominio": "robotica",
+ "tema": "How drones fly",
+ "video_path": "videos/cuenta1/1794451133048_2273.mp4",
+ "hora": 19
+}
