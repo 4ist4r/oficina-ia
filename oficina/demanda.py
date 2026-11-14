@@ -52,6 +52,16 @@ def peticiones(estado, dias=30):
 def candidatos(estado, cuenta_id, dominios=None, n=8, max_por_dominio=2):
     cat = [t for t in catalogo() if not dominios or t["dominio"] in dominios]
     publicados = {r[0] for r in estado.q("select tema from publicaciones where tema is not null and ts>=?", (time.time() - COOLDOWN_DIAS * 86400,)).fetchall()}
+    # también lo ya encolado (pendiente de publicar, aunque todavía no haya salido): si no se excluye aquí,
+    # un retraso en publicar (cron lento, reintento) hace que el mismo tema se vuelva a elegir al día siguiente
+    # antes de que el primer intento se cuente como "publicado" (visto en real: "space telescope" 2 días seguidos)
+    for (datos_raw,) in estado.q("select datos from cola where cuenta=? and estado='pendiente'", (cuenta_id,)).fetchall():
+        try:
+            tema_pendiente = json.loads(datos_raw).get("tema")
+        except Exception:
+            tema_pendiente = None
+        if tema_pendiente:
+            publicados.add(tema_pendiente)
     dom_r, tem_r = _rend_dominio(estado, cuenta_id)
     pet = dict(peticiones(estado))
     vistas = {t["wiki"]: _views(estado, t["wiki"]) for t in cat if t["tema"] not in publicados}
