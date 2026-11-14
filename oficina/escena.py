@@ -353,6 +353,33 @@ def chiptune(ruta, seg, sr=22050, ritmo=1.0):
         w.writeframes((audio * 32767).astype("<i2").tobytes())
     return ruta
 
+def ambiente(ruta, seg, sr=22050):
+    """Pad ambiental suave (solo ondas seno, con subida/bajada de volumen progresiva, nada de onda cuadrada
+    dura) para vídeos sin voz tipo 3blue1brown: la chiptune de arriba suena a videojuego, aquí no toca."""
+    n = int(seg * sr); t = np.arange(n) / sr
+    audio = np.zeros(n)
+    acordes = [
+        [146.83, 174.61, 220.00, 261.63],  # Dm7
+        [130.81, 164.81, 196.00, 246.94],  # Cmaj7
+        [116.54, 146.83, 174.61, 220.00],  # Bbmaj7
+        [110.00, 130.81, 164.81, 196.00],  # Am7
+    ]
+    dur_acorde = seg / len(acordes)
+    for i, ac in enumerate(acordes):
+        t0, t1 = i * dur_acorde, (i + 1) * dur_acorde
+        a, b = int(t0 * sr), min(n, int(t1 * sr))
+        if a >= n: continue
+        tt = t[a:b]
+        env = np.sin(np.pi * np.clip((tt - t0) / (t1 - t0), 0, 1)) ** 0.7  # entra y sale suave, sin clics
+        for f in ac:
+            audio[a:b] += (0.5 / len(ac)) * env * np.sin(2 * np.pi * f * tt)
+        audio[a:b] += 0.06 * env * np.sin(2 * np.pi * ac[-1] * 2 * tt)  # un armónico suave, para que no suene plano
+    audio = audio / (np.max(np.abs(audio)) + 1e-9) * 0.5
+    with wave.open(ruta, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
+        w.writeframes((audio * 32767).astype("<i2").tobytes())
+    return ruta
+
 def renderizar(escena, salida, voz=None, dur_defecto=25.0, seed=7):
     """Devuelve la ruta del mp4 (1080x1920, 30fps, voz + música chiptune)."""
     e = validar(escena); pal = PALETAS[e["paleta"]]; lay = disponer(e)
