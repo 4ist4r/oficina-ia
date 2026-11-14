@@ -13,6 +13,8 @@ def main():
     ap.add_argument("--cuenta", help="solo esta cuenta (id)")
     ap.add_argument("--forzar", action="store_true", help="produce ahora aunque ya se haya producido hoy")
     ap.add_argument("--sin-panel", action="store_true", dest="sin_panel", help="no mide métricas ni responde comentarios (solo producción)")
+    ap.add_argument("--sin-produccion", action="store_true", dest="sin_produccion",
+                     help="no genera vídeos nuevos con los agentes (los vídeos se hacen a mano ahora); solo publica lo que ya está en cola, mide y responde comentarios")
     a = ap.parse_args()
     cfg = json.load(open("config.json", encoding="utf-8"))
     cuentas = [c for c in cfg["cuentas"] if not a.cuenta or c["id"] == a.cuenta]
@@ -22,6 +24,8 @@ def main():
     while True:
         hoy = datetime.now(tz).strftime("%Y-%m-%d")
         for c in cuentas:  # 1 vez al día: producir y programar
+            if a.sin_produccion:
+                continue
             fecha, _ = estado.ultima_nota(c["id"], "produccion")
             if fecha != hoy or a.forzar:
                 try:
