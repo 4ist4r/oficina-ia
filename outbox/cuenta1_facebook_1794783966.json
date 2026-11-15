@@ -1,0 +1,20 @@
+{
+ "motivo": "simulación o sin credenciales",
+ "plataforma": "facebook",
+ "titulo": "The Fundamental Theorem of Calculus",
+ "caption": "The fundamental theorem of calculus 🤖\n\nWe've seen area build up from thin slices (the integral). We've seen slope come from two points squeezed together (the derivative). Turns out they're the same idea, running in reverse.\n\nLet the area up to a point be its own function, and sweep that point forward: it grows exactly as fast as the curve's height, right there. Add up that rate and you rebuild the exact amount.\n\nPart 3 of 3 with Robi. Follow for more ideas explained from first principles.\n\nEducational content.",
+ "hashtags": [
+  "#calculus",
+  "#math",
+  "#mathematics",
+  "#education",
+  "#stem",
+  "#visualmath",
+  "#learnontiktok",
+  "#ftc"
+ ],
+ "video_path": "videos/cuenta1/1794783912516_ftc.mp4",
+ "dominio": "ciencia",
+ "tema": "Fundamental theorem of calculus",
+ "hora": 0
+}
