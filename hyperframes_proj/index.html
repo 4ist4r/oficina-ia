@@ -3,127 +3,244 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=1080, height=1920" />
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
 <style>
-  :root {
-    --ground: #28100c; --ink: #faf0e1; --accent: #ffd750;
-    --metal-light: #aa968c; --metal-dark: #5f3226; --hot: #ff5a28; --cold: #5aa0ff;
-  }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--ground);
+  html, body { width:1080px; height:1920px; overflow:hidden; background:#000;
     font-family:"Archivo Black","Arial Black",sans-serif; }
-  #bg { position:absolute; inset:0;
-    background:
-      radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--cold) 22%, var(--ground)) 0%, var(--ground) 62%),
-      conic-gradient(from 0deg at 50% 85%, color-mix(in srgb, var(--hot) 10%, transparent), transparent 40%); }
-  #root { width:100%; height:100%; position:relative; }
-  #tag { position:absolute; top:190px; left:0; right:0; text-align:center; color:var(--accent);
-    font-size:36px; letter-spacing:9px; text-shadow:3px 3px 0 #000; }
-  #cifra { position:absolute; top:272px; left:0; right:0; text-align:center; color:var(--ink);
-    font-size:80px; line-height:1.08; text-shadow:6px 6px 0 #000; padding:0 70px; }
-  #stage { position:absolute; left:50%; top:630px; width:700px; height:700px; margin-left:-350px; }
-  #marca { position:absolute; bottom:120px; left:0; right:0; text-align:center; color:var(--metal-light);
-    font-size:30px; letter-spacing:5px; }
-  .sub { position:absolute; bottom:420px; left:60px; right:60px; text-align:center; color:var(--ink);
-    font-size:48px; line-height:1.15; text-shadow:4px 4px 0 #000; overflow:visible; }
+  #c { position:absolute; inset:0; z-index:0; }
+  #robi-wrap { position:absolute; left:50%; top:1280px; width:10px; height:10px; z-index:2; }
+  .sub { position:absolute; left:60px; right:60px; bottom:190px; text-align:center; color:#f5f7ff;
+    font-size:42px; line-height:1.18; text-shadow:4px 4px 0 #000; z-index:3; }
   .sub span { display:block; }
-  .ov { position:absolute; transform:translate(-50%,-50%); color:var(--ink); text-align:center;
-    text-shadow:4px 4px 0 #000; white-space:nowrap; letter-spacing:1px; }
-  .ov span { display:block; }
-  #flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; }
+  #marca { position:absolute; bottom:110px; left:0; right:0; text-align:center; color:#5a6478;
+    font-size:26px; letter-spacing:5px; z-index:3; opacity:0; }
 </style>
 </head>
 <body>
-  <div id="root" data-composition-id="main" data-start="0" data-duration="30.56" data-width="1080" data-height="1920">
-    <div id="bg" class="clip" data-start="0" data-duration="30.56" data-track-index="0"></div>
-    <div id="tag" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>Real speed</div>
-    <div id="cifra" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>400 EXPLOSIONS PER SECOND AT 6,000 RPM</div>
-    <div id="stage" class="clip" data-start="0" data-duration="30.56" data-track-index="1" data-layout-allow-overlap>
-      
-      <div id="gear"></div>
-      <div id="piston"></div>
-      <style>
-        #gear { position:absolute; left:50%; top:50%; width:420px; height:420px;
-          margin-left:-210px; margin-top:-210px;
-          background: repeating-conic-gradient(#aa968c 0deg 15deg, #5f3226 15deg 30deg);
-          border-radius:50%;
-          clip-path: polygon(50% 0%,56% 0%,58% 8%,66% 6%,70% 13%,78% 10%,80% 18%,88% 18%,88% 26%,96% 28%,
-            94% 36%,100% 40%,96% 48%,100% 56%,94% 60%,96% 68%,88% 70%,88% 78%,80% 78%,78% 86%,70% 83%,
-            66% 90%,58% 88%,56% 96%,50% 96%,44% 96%,42% 88%,34% 90%,30% 83%,22% 86%,20% 78%,12% 78%,
-            12% 70%,4% 68%,6% 60%,0% 56%,4% 48%,0% 40%,6% 36%,4% 28%,12% 26%,12% 18%,20% 18%,22% 10%,
-            30% 13%,34% 6%,42% 8%);
-          box-shadow: inset 10px 10px 0 rgba(255,255,255,.25), inset -10px -10px 0 rgba(0,0,0,.4); }
-        #gear::after { content:""; position:absolute; left:50%; top:50%; width:150px; height:150px;
-          margin-left:-75px; margin-top:-75px;
-          border-radius:50%; background:#5f3226;
-          box-shadow: inset 8px 8px 0 rgba(0,0,0,.5), inset -8px -8px 0 rgba(255,255,255,.15); }
-        #piston { position:absolute; left:50%; top:50%; width:80px; height:380px;
-          margin-left:-40px; margin-top:-430px;
-          background: linear-gradient(90deg,#5f3226 0%,#aa968c 45%,#ff9646 55%,#5f3226 100%);
-          box-shadow: inset 6px 0 0 rgba(255,255,255,.3), inset -6px 0 0 rgba(0,0,0,.4); }
-        #piston::before { content:""; position:absolute; left:-18px; top:-36px; width:116px; height:56px;
-          background:#aa968c;
-          box-shadow: inset 6px 6px 0 rgba(255,255,255,.3), inset -6px -6px 0 rgba(0,0,0,.45); }
-      </style>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="29.6" data-width="1080" data-height="1920">
+    <canvas id="c" class="clip" data-start="0" data-duration="29.6" data-track-index="0"></canvas>
+
+    <div id="robi-wrap" class="clip" data-start="0" data-duration="29.6" data-track-index="1">
+      <svg id="robi" width="260" height="295" viewBox="-100 -140 200 220" style="position:absolute;left:50%;top:50%;margin-left:-130px;margin-top:-147px;overflow:visible">
+        <ellipse id="robi-hoverglow" cx="0" cy="78" rx="46" ry="8" fill="#5fd0ff" opacity="0.5" />
+        <ellipse cx="0" cy="76" rx="38" ry="10" fill="#4a5468" />
+        <g transform="translate(34,18)">
+          <g id="robi-arm-pivot">
+            <rect x="-8" y="0" width="16" height="52" rx="8" fill="#aab2c0" />
+          </g>
+        </g>
+        <rect id="robi-body" x="-34" y="18" width="68" height="60" rx="26" fill="#c7cedd" />
+        <circle id="robi-chest" cx="0" cy="44" r="13" fill="#ff6a2b" />
+        <g id="robi-head-g">
+          <circle id="robi-head" cx="0" cy="-32" r="46" fill="#e7ecf5" />
+          <ellipse cx="0" cy="-34" rx="32" ry="20" fill="#16202e" />
+          <circle id="robi-eyeL" cx="-13" cy="-34" r="7" fill="#5fd0ff" />
+          <circle id="robi-eyeR" cx="13" cy="-34" r="7" fill="#5fd0ff" />
+          <line x1="0" y1="-78" x2="0" y2="-96" stroke="#8a95ab" stroke-width="4" />
+          <circle id="robi-antenna" cx="0" cy="-100" r="7" fill="#ff6a2b" />
+        </g>
+      </svg>
     </div>
-    <div id="sub0" class="clip sub" data-start="0.00" data-duration="2.89"><span id="sub0i">HOW DOES A V8 ENGINE KEEP EIGHT EXPLOSIONS IN</span></div><div id="sub1" class="clip sub" data-start="2.97" data-duration="0.84"><span id="sub1i">PERFECT ORDER?</span></div><div id="sub2" class="clip sub" data-start="3.90" data-duration="1.11"><span id="sub2i">WATCH THE CUTAWAY.</span></div><div id="sub3" class="clip sub" data-start="5.09" data-duration="2.63"><span id="sub3i">FIRST, THE SPARK PLUG IGNITES THE FUEL IN</span></div><div id="sub4" class="clip sub" data-start="7.79" data-duration="0.78"><span id="sub4i">CYLINDER ONE.</span></div><div id="sub5" class="clip sub" data-start="8.65" data-duration="2.50"><span id="sub5i">THE PISTON IS SHOVED DOWN AND TURNS THE</span></div><div id="sub6" class="clip sub" data-start="11.23" data-duration="0.65"><span id="sub6i">CRANKSHAFT.</span></div><div id="sub7" class="clip sub" data-start="11.95" data-duration="2.69"><span id="sub7i">NINETY CRANK DEGREES LATER, CYLINDER EIGHT</span></div><div id="sub8" class="clip sub" data-start="14.73" data-duration="0.32"><span id="sub8i">FIRES.</span></div><div id="sub9" class="clip sub" data-start="15.12" data-duration="2.56"><span id="sub9i">THEN FOUR, THREE, SIX, FIVE, SEVEN, TWO.</span></div><div id="sub10" class="clip sub" data-start="17.77" data-duration="2.69"><span id="sub10i">THATS THE CLASSIC CHEVY SMALL-BLOCK ORDER.</span></div><div id="sub11" class="clip sub" data-start="20.54" data-duration="2.30"><span id="sub11i">EVERY CRANK TURN DELIVERS FOUR POWER</span></div><div id="sub12" class="clip sub" data-start="22.92" data-duration="2.89"><span id="sub12i">STROKES, SO AT 6,000 RPM THATS 400 EXPLOSIONS</span></div><div id="sub13" class="clip sub" data-start="25.89" data-duration="0.78"><span id="sub13i">EVERY SECOND.</span></div><div id="sub14" class="clip sub" data-start="26.75" data-duration="2.23"><span id="sub14i">FOLLOW FOR MORE MACHINES EXPLAINED.</span></div>
-    <div id="ov1001" class="clip ov" data-start="0.00" data-duration="4.89" style="left:540px;top:510px;font-size:52px"><span id="ov1001i">0</span></div><div id="ov1002" class="clip ov" data-start="16.81" data-duration="5.20" style="left:540px;top:640px;font-size:36px"><span id="ov1002i">1-8-4-3-6-5-7-2</span></div><div id="ov1003" class="clip ov" data-start="22.61" data-duration="5.50" style="left:540px;top:640px;font-size:36px"><span id="ov1003i">400 EXPLOSIONS/SEC</span></div>
-    <div id="marca" class="clip" data-start="0" data-duration="30.56" data-track-index="1">@robotlabs8</div>
-    <div id="flash" class="clip" data-start="0" data-duration="30.56" data-track-index="2"></div>
+
+    <div id="sub0" class="clip sub" data-start="0" data-duration="2.52"><span id="sub0i">WHAT DOES AN INTEGRAL ACTUALLY DO?</span></div>
+    <div id="sub1" class="clip sub" data-start="2.62" data-duration="3.21"><span id="sub1i">PICTURE SOMETHING THAT KEEPS CHANGING, LIKE</span></div>
+    <div id="sub2" class="clip sub" data-start="5.93" data-duration="1.13"><span id="sub2i">SPEED OVER TIME.</span></div>
+    <div id="sub3" class="clip sub" data-start="7.16" data-duration="3.36"><span id="sub3i">BREAK THE CURVE INTO THIN SLICES, WIDTH TIMES</span></div>
+    <div id="sub4" class="clip sub" data-start="10.62" data-duration="1.75"><span id="sub4i">HEIGHT, AND ADD THEM UP.</span></div>
+    <div id="sub5" class="clip sub" data-start="12.47" data-duration="1.67"><span id="sub5i">THAT'S A ROUGH ESTIMATE.</span></div>
+    <div id="sub6" class="clip sub" data-start="14.24" data-duration="2.21"><span id="sub6i">NOW MAKE THE SLICES THINNER...</span></div>
+    <div id="sub7" class="clip sub" data-start="16.55" data-duration="0.82"><span id="sub7i">AND THINNER.</span></div>
+    <div id="sub8" class="clip sub" data-start="17.47" data-duration="3.05"><span id="sub8i">THE ESTIMATE LOCKS ONTO ONE EXACT NUMBER.</span></div>
+    <div id="sub9" class="clip sub" data-start="20.62" data-duration="2.14"><span id="sub9i">THAT'S WHAT THIS SYMBOL MEANS:</span></div>
+    <div id="sub10" class="clip sub" data-start="22.86" data-duration="2.13"><span id="sub10i">SUM IT UP, INFINITELY FINELY.</span></div>
+    <div id="sub11" class="clip sub" data-start="25.09" data-duration="0.67"><span id="sub11i">NOT MAGIC.</span></div>
+    <div id="sub12" class="clip sub" data-start="25.86" data-duration="2.36"><span id="sub12i">JUST A SUM — PUSHED TO ITS LIMIT.</span></div>
+
+    <div id="marca" class="clip" data-start="0" data-duration="29.6" data-track-index="3">@robotlabs8</div>
   </div>
-  <script>
+
+  <script type="module">
+    const W = 1080, H = 1920;
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+    canvas.width = W; canvas.height = H;
+
+    // v(t) = 4 + 2 sin(t), t en [0, 2π]  ->  ∫v dt = 8π ≈ 25.133 (verificado a mano)
+    const TMIN = 0, TMAX = Math.PI * 2;
+    const VMAX_AXIS = 7;
+    const PX0 = 130, PX1 = 950, PY0 = 1150, PY1 = 660;
+    const EXACT = 8 * Math.PI;
+    const v = (t) => 4 + 2 * Math.sin(t);
+    const X = (t) => PX0 + ((t - TMIN) / (TMAX - TMIN)) * (PX1 - PX0);
+    const Y = (val) => PY0 + (val / VMAX_AXIS) * (PY1 - PY0);
+
+    function axes(alpha) {
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "#3a4150"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(PX0, PY0); ctx.lineTo(PX1, PY0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(PX0, PY0); ctx.lineTo(PX0, PY1 - 20); ctx.stroke();
+      ctx.fillStyle = "#5a6478"; ctx.font = "26px 'JetBrains Mono', monospace"; ctx.textAlign = "center";
+      [["0", 0], ["π/2", Math.PI / 2], ["π", Math.PI], ["3π/2", 3 * Math.PI / 2], ["2π", 2 * Math.PI]].forEach(([lab, tv]) => {
+        ctx.beginPath(); ctx.moveTo(X(tv), PY0); ctx.lineTo(X(tv), PY0 + 10); ctx.stroke();
+        ctx.fillText(lab, X(tv), PY0 + 42);
+      });
+      ctx.textAlign = "right";
+      [0, 2, 4, 6].forEach((vv) => {
+        ctx.beginPath(); ctx.moveTo(PX0 - 10, Y(vv)); ctx.lineTo(PX0, Y(vv)); ctx.stroke();
+        ctx.fillText(String(vv), PX0 - 18, Y(vv) + 9);
+      });
+      ctx.fillStyle = "#8a95ab"; ctx.font = "28px 'JetBrains Mono', monospace"; ctx.textAlign = "center";
+      ctx.fillText("t", PX1 + 30, PY0 + 9);
+      ctx.fillText("v(t)", PX0, PY1 - 40);
+      ctx.restore();
+    }
+
+    function curve(alpha, upTo) {
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "#f5f7ff"; ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.lineCap = "round";
+      ctx.beginPath();
+      const N = 240;
+      for (let i = 0; i <= N; i++) {
+        const t = TMIN + (TMAX - TMIN) * (i / N);
+        if (t > upTo) break;
+        const x = X(t), y = Y(v(t));
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke(); ctx.restore();
+    }
+
+    function rects(n, alpha) {
+      ctx.save(); ctx.globalAlpha = alpha;
+      const dt = (TMAX - TMIN) / n;
+      for (let i = 0; i < n; i++) {
+        const tc = TMIN + (i + 0.5) * dt;
+        const h = v(tc);
+        const x0 = X(TMIN + i * dt), x1 = X(TMIN + (i + 1) * dt);
+        const y0 = Y(h), y1 = Y(0);
+        ctx.fillStyle = "rgba(95,208,255,0.28)";
+        ctx.fillRect(x0, y0, x1 - x0 - Math.max(0.4, (x1 - x0) * 0.04), y1 - y0);
+        ctx.strokeStyle = "rgba(95,208,255,0.85)"; ctx.lineWidth = 1.2;
+        ctx.strokeRect(x0, y0, x1 - x0 - Math.max(0.4, (x1 - x0) * 0.04), y1 - y0);
+      }
+      ctx.restore();
+    }
+
+    function riemannSum(n) {
+      const dt = (TMAX - TMIN) / n; let s = 0;
+      for (let i = 0; i < n; i++) s += v(TMIN + (i + 0.5) * dt) * dt;
+      return s;
+    }
+
+    function fillArea(alpha) {
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.fillStyle = "rgba(95,208,255,0.3)";
+      ctx.beginPath(); ctx.moveTo(X(TMIN), Y(0));
+      const N = 240;
+      for (let i = 0; i <= N; i++) { const t = TMIN + (TMAX - TMIN) * (i / N); ctx.lineTo(X(t), Y(v(t))); }
+      ctx.lineTo(X(TMAX), Y(0)); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+
+    function readout(text, sub, alpha, y0) {
+      ctx.save(); ctx.globalAlpha = alpha; ctx.textAlign = "center";
+      ctx.fillStyle = "#5fd0ff"; ctx.font = "bold 88px 'JetBrains Mono', monospace";
+      ctx.fillText(text, W / 2, y0);
+      if (sub) { ctx.fillStyle = "#aab4c6"; ctx.font = "bold 36px 'JetBrains Mono', monospace"; ctx.fillText(sub, W / 2, y0 + 58); }
+      ctx.restore();
+    }
+
+    function generic(alpha) {
+      ctx.save(); ctx.globalAlpha = alpha; ctx.textAlign = "center";
+      ctx.fillStyle = "#ffd23f"; ctx.font = "bold 110px 'JetBrains Mono', monospace";
+      ctx.fillText("∫ f(x) dx", W / 2, 450);
+      ctx.fillStyle = "#8a95ab"; ctx.font = "32px 'JetBrains Mono', monospace";
+      ctx.fillText("ADD IT ALL UP, INFINITELY FINELY", W / 2, 520);
+      ctx.restore();
+    }
+
+    // ---------- fases (en segundos reales, sincronizadas a la narración) ----------
+    const DURATION = 29.6;
+    const AXES_IN = [2.7, 3.4];
+    const CURVE_IN = [3.4, 5.9];
+    const RECT_WINDOW = [7.2, 17.4]; // n: 3 -> 90
+    const LIVE_OUT = [19.9, 20.3];
+    const GENERIC_IN = [20.5, 21.1];
+    const GENERIC_OUT = [24.9, 25.3];
+    const FINAL_IN = [25.3, 26.0];
+
+    function smooth(a, b, t) { const p = Math.max(0, Math.min(1, (t - a) / (b - a))); return p * p * (3 - 2 * p); }
+
+    function renderAt(t) {
+      ctx.clearRect(0, 0, W, H);
+
+      const aAxes = smooth(...AXES_IN, t);
+      if (aAxes > 0) axes(aAxes);
+      const curveUpTo = TMIN + (TMAX - TMIN) * smooth(...CURVE_IN, t);
+      if (aAxes > 0) curve(aAxes, Math.max(TMIN + 0.001, curveUpTo));
+
+      if (t >= RECT_WINDOW[0] && t < GENERIC_IN[1]) {
+        const p = smooth(RECT_WINDOW[0], RECT_WINDOW[1], Math.min(t, RECT_WINDOW[1]));
+        const n = Math.max(3, Math.round(3 * Math.pow(90 / 3, p)));
+        const aRect = smooth(RECT_WINDOW[0], RECT_WINDOW[0] + 0.3, t) * (1 - smooth(LIVE_OUT[0], LIVE_OUT[1], t));
+        if (aRect > 0.01) rects(n, aRect);
+        const aText = smooth(RECT_WINDOW[0] + 0.1, RECT_WINDOW[0] + 0.5, t) * (1 - smooth(LIVE_OUT[0], LIVE_OUT[1], t));
+        if (aText > 0.01) readout(riemannSum(n).toFixed(2), `${n} rectangles`, aText, 340);
+      }
+
+      const aGeneric = smooth(...GENERIC_IN, t) * (1 - smooth(GENERIC_OUT[0], GENERIC_OUT[1], t));
+      if (aGeneric > 0.01) generic(aGeneric);
+
+      const aFinal = smooth(...FINAL_IN, t);
+      if (aFinal > 0) {
+        fillArea(aFinal * 0.9); curve(aFinal, TMAX);
+        readout(EXACT.toFixed(3) + "…", "∫₀^2π (4 + 2 sin t) dt  =  8π", aFinal, 340);
+      }
+    }
+
+    // ---------- Robi: gestos ----------
+    window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+    renderAt(0);
+
     const tl = gsap.timeline({ paused: true });
-    tl.fromTo("#tag", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 0);
-    tl.fromTo("#cifra", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0.15);
-    tl.fromTo("#marca", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.6);
-    
-      tl.to("#gear", { rotation: 360 * 22.9, duration: 30.56, ease: "none" }, 0);
-      tl.fromTo("#piston", { y: 0 }, { y: 160, duration: 0.333,
-        repeat: 91, yoyo: true, ease: "sine.inOut" }, 0);
-    
-      tl.fromTo("#sub0i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.00);
-      tl.to("#sub0i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 2.79);
-      tl.fromTo("#sub1i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 2.97);
-      tl.to("#sub1i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 3.72);
-      tl.fromTo("#sub2i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 3.90);
-      tl.to("#sub2i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 4.91);
-      tl.fromTo("#sub3i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 5.09);
-      tl.to("#sub3i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 7.61);
-      tl.fromTo("#sub4i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 7.79);
-      tl.to("#sub4i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 8.47);
-      tl.fromTo("#sub5i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 8.65);
-      tl.to("#sub5i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 11.05);
-      tl.fromTo("#sub6i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 11.23);
-      tl.to("#sub6i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 11.77);
-      tl.fromTo("#sub7i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 11.95);
-      tl.to("#sub7i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 14.55);
-      tl.fromTo("#sub8i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 14.73);
-      tl.to("#sub8i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 14.94);
-      tl.fromTo("#sub9i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 15.12);
-      tl.to("#sub9i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 17.59);
-      tl.fromTo("#sub10i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 17.77);
-      tl.to("#sub10i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 20.36);
-      tl.fromTo("#sub11i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 20.54);
-      tl.to("#sub11i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 22.74);
-      tl.fromTo("#sub12i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 22.92);
-      tl.to("#sub12i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 25.71);
-      tl.fromTo("#sub13i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 25.89);
-      tl.to("#sub13i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 26.57);
-      tl.fromTo("#sub14i", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 26.75);
-      tl.to("#sub14i", { opacity: 0, duration: 0.1, ease: "power2.in" }, 28.88);
-    
-      { const o = { v: 0.0 };
-        tl.fromTo("#ov1001i", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.00);
-        tl.to(o, { v: 6000.0, duration: 4.16, ease: "power1.out",
-          onUpdate: () => { const el = document.getElementById("ov1001i");
-            if (el) el.textContent = "" + Math.round(o.v).toLocaleString("en-US") + " RPM"; } }, 0.00); }
-      tl.fromTo("#ov1002i", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.2 }, 16.81);
-      tl.to("#ov1002i", { opacity: 0, duration: 0.15, ease: "power2.in" }, 21.85);
-      tl.fromTo("#ov1003i", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.2 }, 22.61);
-      tl.to("#ov1003i", { opacity: 0, duration: 0.15, ease: "power2.in" }, 27.97);
+    tl.to({}, { duration: DURATION }, 0);
+
+    // bob + parpadeo continuos (sin tocar el canvas, es SVG aparte)
+    tl.to("#robi-wrap", { y: "-=10", duration: 1.6, ease: "sine.inOut", repeat: 18, yoyo: true }, 0);
+    for (let i = 0; i < 20; i++) {
+      const t0 = i * 1.5 + 0.6;
+      if (t0 > DURATION - 0.3) break;
+      tl.to("#robi-eyeL, #robi-eyeR", { scaleY: 0.15, duration: 0.06, yoyo: true, repeat: 1 }, t0);
+    }
+    tl.to("#robi-antenna", { fill: "#ffb98a", duration: 1.1, yoyo: true, repeat: 14, ease: "sine.inOut" }, 0);
+
+    // mira hacia la gráfica cuando se dibuja
+    tl.to("#robi-head-g", { rotation: -8, transformOrigin: "0px -32px", duration: 0.6 }, AXES_IN[0]);
+    tl.to("#robi-wrap", { rotation: -4, transformOrigin: "50% 100%", duration: 0.6 }, AXES_IN[0]);
+
+    // señala hacia arriba (fórmula genérica) justo cuando aparece
+    gsap.set("#robi-arm-pivot", { transformOrigin: "0px 0px" });
+    tl.fromTo("#robi-arm-pivot", { rotation: 20 }, { rotation: -95, duration: 0.4, ease: "back.out(1.6)" }, GENERIC_IN[0] - 0.3);
+    tl.to("#robi-head-g", { rotation: 6, transformOrigin: "0px -32px", duration: 0.4 }, GENERIC_IN[0] - 0.3);
+    tl.to("#robi-arm-pivot", { rotation: 20, duration: 0.5 }, GENERIC_OUT[1]);
+    tl.to("#robi-head-g", { rotation: 0, transformOrigin: "0px -32px", duration: 0.5 }, GENERIC_OUT[1]);
+
+    // gesto final: orgulloso, brazo arriba
+    tl.to("#robi-arm-pivot", { rotation: -60, duration: 0.4, ease: "back.out(1.6)" }, FINAL_IN[0]);
+    tl.to("#robi-wrap", { rotation: 0, transformOrigin: "50% 100%", duration: 0.4 }, FINAL_IN[0]);
+
+    // subtítulos: fundido simple por bloque
+    for (let i = 0; i <= 12; i++) {
+      const el = `#sub${i}i`;
+      const host = document.getElementById(`sub${i}`);
+      const start = parseFloat(host.dataset.start), dur = parseFloat(host.dataset.duration);
+      tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.12 }, start);
+      tl.to(el, { opacity: 0, duration: 0.1 }, Math.max(start, start + dur - 0.1));
+    }
+
+    tl.fromTo("#marca", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 1.0);
+
     window.__timelines = window.__timelines || {};
     window.__timelines["main"] = tl;
-    tl.seek(0);
   </script>
 </body>
 </html>
